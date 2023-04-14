@@ -1,3 +1,4 @@
+<!doctype HTML>
 <html lang="en">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
@@ -151,7 +152,6 @@
 <i id="error" style="color: red; display: block"></i>
 
 <div class="settings">
-  <h2>Settings</h2>
   <div data-settingIndex="0" class="settingsPage active">
     <label for="shortCutInput" style="padding: 0.5rem">
       <p style="font-size: 1rem">
@@ -245,8 +245,12 @@
   </div>
 
   <div data-settingIndex="4" class="settingsPage list">
+    <label for="watchHistory" style="margin-top: 0.25rem; margin-bottom: 0.25rem; padding-top: 0.25rem">
+      Skip watched videos:
+      <input type="checkbox" name="watchHistory" id="watchHistory" checked="checked" style="color: rgb(128, 128, 128);"/>
+    </label>
     <label for="filterAuthors">
-      <p style="font-size: 1rem; padding-top: 0.5rem">
+      <p style="font-size: 1rem; padding-top: 0.25rem">
         Block Video Creators
         <i style="font-size: 0.7em; display: block; margin-bottom: 0.5rem">
           Auto skips video by inputted creators (Separate by a

@@ -8,11 +8,13 @@ const COMMENTS_SELECTOR = "body > ytd-app > ytd-popup-container > tp-yt-paper-di
 let shortCutToggleKeys = [];
 let shortCutInteractKeys = [];
 let scrollOnCommentsCheck = false;
+let watchHistory = false;
 let amountOfPlays = 0;
 let amountOfPlaysToSkip = 1;
 let filterMinLength = "none";
 let filterMaxLength = "none";
 let blockedCreators = [];
+let watchedVideos = [];
 // STATE VARIABLES
 let currentVideoIndex = null;
 let applicationIsOn = false;
@@ -112,6 +114,10 @@ async function scrollToNextShort() {
     }
     amountOfPlays = 0;
     scrollingIsDone = false;
+    const videoId = window.location.href.split("/")[4];
+    watchedVideos.push(videoId);
+    await browser.storage.local.set({watchedVideos: watchedVideos});
+
     const nextVideoParent = document.getElementById(`${Number(currentVideoParent?.id) + 1}`);
     if (nextVideoParent) {
         nextVideoParent.scrollIntoView({
@@ -151,6 +157,13 @@ function checkIfValidVideo() {
             .map((c) => c.toLowerCase().replace("@", ""))
             .includes(authorOfVideo)) {
         return false;
+    }
+    // Check if video is watched before and if it is, skip it (FROM SETTINGS)
+    if (watchHistory) {
+        const videoId = window.location.href.split("/")[4];
+        if (videoId && watchedVideos.includes(videoId)) {
+            return false;
+        }
     }
     // Check if the video is within the length filter (FROM SETTINGS)
     if (filterMaxLength !== "none" || filterMinLength !== "none") {
@@ -192,6 +205,8 @@ function getParentVideo() {
             "filterByMaxLength",
             "filteredAuthors",
             "scrollOnComments",
+            "watchHistory",
+            "watchedVideos"
         ]).then((result) => {
             if (result["shortCutKeys"])
                 shortCutToggleKeys = [...result["shortCutKeys"]];
@@ -207,8 +222,13 @@ function getParentVideo() {
                 filterMaxLength = result["filterByMaxLength"];
             if (result["filteredAuthors"])
                 blockedCreators = [...result["filteredAuthors"]];
+            if (result["watchHistory"])
+                watchHistory = result["watchHistory"];
+            if (result["watchedVideos"])
+                watchedVideos = [...result["watchedVideos"]];
             shortCutListener();
         });
+
         browser.storage.onChanged.addListener((result) => {
             let newShortCutKeys = result["shortCutKeys"]?.newValue;
             if (newShortCutKeys !== undefined) {
@@ -226,6 +246,10 @@ function getParentVideo() {
             if (newScrollOnComments !== undefined) {
                 scrollOnCommentsCheck = newScrollOnComments;
             }
+            let newWatchHistory = result["watchHistory"]?.newValue;
+            if (newWatchHistory !== undefined) {
+                watchHistory = newWatchHistory;
+            }
             let newFilterMinLength = result["filterByMinLength"]?.newValue;
             if (newFilterMinLength !== undefined) {
                 filterMinLength = newFilterMinLength;
@@ -237,6 +261,10 @@ function getParentVideo() {
             let newBlockedCreators = result["filteredAuthors"]?.newValue;
             if (newBlockedCreators !== undefined) {
                 blockedCreators = [...newBlockedCreators];
+            }
+            let newWatchedVideos = result["watchedVideos"]?.newValue;
+            if (newWatchedVideos !== undefined) {
+                watchedVideos = [...newWatchedVideos];
             }
         });
     })();

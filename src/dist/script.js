@@ -4,6 +4,7 @@ const errMsg = document.querySelector("#error");
 const toggleBtn = document.querySelector(".toggleBtn");
 const validUrls = [`${YOUTUBE_LINK}/shorts`, `${YOUTUBE_LINK}/hashtag/shorts`];
 const filteredAuthors = document.querySelector("#filterAuthors");
+const watchHistoryInput = document.querySelector("#watchHistory");
 const shortCutInput = document.querySelector("#shortCutInput");
 const shortCutInteractInput = document.querySelector("#shortCutInteractInput");
 const filterByMaxLength = document.querySelector("#filterByMaxLength");
@@ -176,6 +177,19 @@ function getAllSettingsForPopup() {
     scrollOnCommentsInput.addEventListener("change", async (e) => {
         await browser.storage.local.set({
             scrollOnComments: e.target.checked,
+        });
+    });
+    browser.storage.local.get(["watchHistory"]).then(async (result) => {
+        let value = result["watchHistory"];
+        if (value === undefined) {
+            await browser.storage.local.set({ watchHistory: false });
+            watchHistoryInput.checked = true;
+        }
+        watchHistoryInput.checked = value;
+    });
+    watchHistoryInput.addEventListener("change", async (e) => {
+        await browser.storage.local.set({
+            watchHistory: e.target.checked,
         });
     });
     browser.storage.onChanged.addListener((result) => {

@@ -8,6 +8,7 @@ browser.runtime.onInstalled.addListener(async () => {
             "filterByMinLength",
             "amountOfPlaysToSkip",
             "scrollOnComments",
+            "watchHistory",
             "shortCutKeys",
             "shortCutInteractKeys",
             "filteredAuthors",
@@ -28,6 +29,9 @@ browser.runtime.onInstalled.addListener(async () => {
         }
         if (result.scrollOnComments === undefined) {
             browser.storage.local.set({scrollOnComments: false});
+        }
+        if (result.watchHistory === undefined) {
+            browser.storage.local.set({watchHistory: false});
         }
         if (result.shortCutKeys === undefined) {
             browser.storage.local.set({shortCutKeys: ["shift", "s"]});
